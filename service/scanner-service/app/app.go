@@ -1,0 +1,83 @@
+package app
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
+	"time"
+
+	"portto-homework/internal/utils/logger"
+	"portto-homework/service/scanner-service/config"
+)
+
+var (
+	templateApp   *TemplateApp
+	serverSetOnce sync.Once
+	stop          = make(chan error, 1)
+	wg            = &sync.WaitGroup{}
+)
+
+type TemplateApp struct {
+	conf config.ConfigSetup
+}
+
+func newTemplateServer(ctx context.Context, conf config.ConfigSetup) {
+	serverSetOnce.Do(func() {
+		templateApp = &TemplateApp{
+			conf: conf,
+		}
+	})
+}
+
+func Run() {
+	if err := config.InitConfig(); err != nil {
+		panic(err)
+	}
+
+	if err := logger.InitSysLog(
+		config.GetServerConfig().Name,
+		config.GetServerConfig().Level); err != nil {
+		panic(err)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	if newTemplateServer(ctx, config.GetConfig()); templateApp == nil {
+		panic(errors.New("templateApp is nil"))
+	}
+	defer func() {
+		templateApp.gracefulShutdownAPP(ctx, cancel)
+	}()
+
+	// listen system signal
+	wg.Add(1)
+	go func(w *sync.WaitGroup) {
+		defer w.Done()
+		quit := make(chan os.Signal, 1)
+		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+		logger.SysLog().Info(ctx, fmt.Sprintf("system stop event signal: %s", <-quit))
+		stop <- nil
+	}(wg)
+
+	<-stop
+}
+
+func (a *TemplateApp) gracefulShutdownAPP(ctx context.Context, cancel context.CancelFunc) {
+	cancel()
+	c := make(chan struct{})
+	go func() {
+		wg.Wait()
+		c <- struct{}{}
+	}()
+
+	select {
+	case <-c:
+		return
+	case <-time.After(time.Duration(a.conf.ServerConfig.ShutdownTimeout) * time.Second):
+		logger.SysLog().Error(ctx, "graceful shutdown timeout")
+		return
+	}
+}
