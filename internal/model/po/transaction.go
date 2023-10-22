@@ -6,11 +6,10 @@ type Transaction struct {
 	BlockNum uint64  `gorm:"<-:create;column:block_num;index:idx_block_num"`
 	TxHash   string  `gorm:"<-:create;column:tx_hash"`
 	From     string  `gorm:"<-:create;column:from"`
-	To       *string `gorm:"<-:create;column:to"`
+	To       *string `gorm:"<-:create;column:to;NULL"`
 	Value    string  `gorm:"<-:create;column:value"`
 	Nonce    uint64  `gorm:"<-:create;column:nonce"`
-	Data     string  `gorm:"<-:create;column:data"`
-	//Logs     []interface{} `gorm:"<-:create;column:logs"`
+	Data     []byte  `gorm:"<-:create;column:data;type:blob"`
 
 	CreatedAt
 	UpdatedAt
@@ -21,9 +20,10 @@ type TransactionLog struct {
 	ID
 
 	BlockNum uint64 `gorm:"<-:create;column:block_num;index:idx_block_num"`
-	TxHash   string `gorm:"<-:create;column:tx_hash;index:idx_block_num"`
-	Index    uint64 `gorm:"<-:create;column:index"`
-	Data     string `gorm:"<-:create;column:data"`
+	TxHash   string `gorm:"<-:create;column:tx_hash;index:idx_txn_hash"`
+	Index    uint   `gorm:"<-:create;column:index"`
+	Log      []byte `gorm:"<-:create;column:logs;type:json"`
+
 	CreatedAt
 	UpdatedAt
 	DeletedAt

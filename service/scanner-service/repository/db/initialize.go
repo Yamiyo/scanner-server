@@ -6,5 +6,6 @@ func (d *DBClient) InitDBTable() error {
 	return d.Session().AutoMigrate(
 		&po.Block{},
 		&po.Transaction{},
+		&po.TransactionLog{},
 	)
 }
