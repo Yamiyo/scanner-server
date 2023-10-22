@@ -2,13 +2,16 @@ server_config:
   name: "Local-Test"
   env: "DEV"
   level: "debug"
-  shutdown_timeout: 5
+  shutdown_timeout: 5 # unit: second
 db_config:
   address: '127.0.0.1:3306'
   username: 'root'
   password: 'portto'
   database: 'blockchain'
   log_mode: true
-  max_idle: 3
-  max_open: 10
+  max_idle: 10
+  max_open: 20
   conn_max_life_min: 15
+scanner_config:
+  pipeline_number: 10
+  scan_block_from: -100 # negative number means from the (latest-n) block, positive number means from the n block

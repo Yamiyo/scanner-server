@@ -59,6 +59,7 @@ func LoadConfig(file string) error {
 
 // ConfigSetup
 type ConfigSetup struct {
-	ServerConfig ServerConfig `mapstructure:"server_config"`
-	DBConfig     DBConfig     `mapstructure:"db_config"`
+	ServerConfig  ServerConfig  `mapstructure:"server_config"`
+	DBConfig      DBConfig      `mapstructure:"db_config"`
+	ScannerConfig ScannerConfig `mapstructure:"scanner_config"`
 }

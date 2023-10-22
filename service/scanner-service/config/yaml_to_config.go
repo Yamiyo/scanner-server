@@ -21,6 +21,12 @@ type DBConfig struct {
 	ConnMaxLifeMin int  `mapstructure:"conn_max_life_min"`
 }
 
+// scanConfig
+type ScannerConfig struct {
+	PipelineNumber int `mapstructure:"pipeline_number"`
+	ScanBlockFrom  int `mapstructure:"scan_block_from"`
+}
+
 func GetConfig() ConfigSetup {
 	return config
 }
@@ -31,4 +37,8 @@ func GetServerConfig() ServerConfig {
 
 func GetDBConfig() DBConfig {
 	return config.DBConfig
+}
+
+func GetScannerConfig() ScannerConfig {
+	return config.ScannerConfig
 }
