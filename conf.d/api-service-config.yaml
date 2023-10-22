@@ -8,7 +8,7 @@ gin_config:
 db_config:
   address: '127.0.0.1:3306'
   username: 'root'
-  password: ''
+  password: 'portto'
   database: 'blockchain'
   log_mode: true
   max_idle: 3

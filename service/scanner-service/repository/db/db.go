@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"portto-homework/internal/utils/logger"
-	"portto-homework/service/api-service/config"
+	"portto-homework/service/scanner-service/config"
 
 	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
@@ -25,9 +25,10 @@ type DBClient struct {
 
 func NewDBClient() *DBClient {
 	once.Do(func() {
-		masterCfg := config.GetDBConfig()
-		db = connectDB(masterCfg)
-		logger.SysLog().Info(context.Background(), fmt.Sprintf("Master database [%s] connected", masterCfg.Address))
+		cfg := config.GetDBConfig()
+		fmt.Printf("cfg: %+v\n", cfg)
+		db = connectDB(cfg)
+		logger.SysLog().Info(context.Background(), fmt.Sprintf("Database [%s] connected", cfg.Address))
 	})
 
 	return &DBClient{client: db}
@@ -46,6 +47,8 @@ func connectDB(cfg config.DBConfig) *gorm.DB {
 		cfg.Address,
 		cfg.Database,
 	)
+
+	fmt.Printf("connect: %s\n", connect)
 	var err error
 	client, err := gorm.Open(mysql.Open(connect), &gorm.Config{})
 	if err != nil {

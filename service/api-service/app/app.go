@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"portto-homework/service/api-service/repository/db"
 	"sync"
 	"syscall"
 	"time"
@@ -37,25 +38,36 @@ func newTemplateServer(ctx context.Context, conf config.ConfigSetup) {
 }
 
 func Run() {
+	// init config from ./config/api-service-config.yaml
 	if err := config.InitConfig(); err != nil {
 		panic(err)
 	}
 
+	// init logger
 	if err := logger.InitSysLog(
 		config.GetServerConfig().Name,
 		config.GetServerConfig().Level); err != nil {
 		panic(err)
 	}
 
+	// init db
+	if err := db.NewDBClient().InitDBTable(); err != nil {
+		panic(err)
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
+
+	// init application server
 	if newTemplateServer(ctx, config.GetConfig()); templateApp == nil {
 		panic(errors.New("templateApp is nil"))
 	}
+
+	// graceful shutdown
 	defer func() {
 		templateApp.gracefulShutdownAPP(ctx, cancel)
 	}()
 
-	// run service
+	// run  restful api service
 	wg.Add(1)
 	go func(w *sync.WaitGroup) {
 		defer w.Done()
