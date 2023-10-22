@@ -9,11 +9,11 @@ import (
 )
 
 var (
-	self *mongoRepo
+	self *core
 	once sync.Once
 )
 
-type mongoRepo struct {
+type core struct {
 	in CoreIn
 	CoreOut
 }
@@ -32,7 +32,7 @@ type CoreOut struct {
 
 func New(in CoreIn) CoreOut {
 	once.Do(func() {
-		self = &mongoRepo{
+		self = &core{
 			in:      in,
 			CoreOut: CoreOut{},
 		}

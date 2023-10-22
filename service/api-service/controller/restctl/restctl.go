@@ -7,11 +7,11 @@ import (
 )
 
 var (
-	self *mongoRepo
+	self *restCtrl
 	once sync.Once
 )
 
-type mongoRepo struct {
+type restCtrl struct {
 	in RestCtrlIn
 	RestCtrlOut
 }
@@ -26,7 +26,7 @@ type RestCtrlOut struct {
 
 func New(in RestCtrlIn) RestCtrlOut {
 	once.Do(func() {
-		self = &mongoRepo{
+		self = &restCtrl{
 			in: in,
 			RestCtrlOut: RestCtrlOut{
 				ModdlewareCtrl: newResponseMiddleware(),
