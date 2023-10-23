@@ -1,7 +1,6 @@
 # portto-homework
 
-# 目錄結構
-
+# Folder Structure
 ---
     |-- Project
         |-- cmd
@@ -22,8 +21,86 @@
 
 ---
 
-# 啟動方式
+# Start Service
 ```
 go run ./cmd/api-server/main.go
 go run ./cmd/scanner-server/main.go
 ```
+
+# Sequence Diagram
+```plantuml
+title API-Service
+
+actor client
+participant api_service
+participant app
+participant rest
+participant restctl
+participant core
+participant repository
+participant DB
+
+opt Server Start
+    api_service->>app: new application
+    app->>rest: new restful api object
+    rest->>DB: new db connection
+    DB-->>rest: return
+    rest->>repository: init repository object
+    repository-->>rest: dependency injection
+    rest->>core: init core object
+    core-->>rest: dependency injection
+    rest->>restctl: init restctl object
+    restctl-->>rest: dependency injection
+    rest-->app: return 
+
+    app->>rest: run restful api server
+end
+
+client->>rest: call api
+rest->>restctl: call api handle function implement
+restctl->>core: call core implement
+core->>repository: call repo implement
+repository->>DB: get data
+
+DB-->>client: return result
+
+```
+
+```plantuml
+
+title Scanner-Service
+
+participant scanner_service
+participant app
+participant core
+participant repository
+participant DB
+participant eth
+
+opt Server Start
+    scanner_service->>app: new application
+    app->>DB: new db connection
+    DB-->>app: return
+    app->>repository: init repository object
+    repository-->>app: dependency injection
+    app->>core: init core object
+    core-->>app: dependency injection
+
+    app->>core: run scanner-server
+    core->>eth: start reat-time pipeline to get latest blocks
+    core->>eth: start history pipeline to get history blocks
+
+    eth-->>core: return result
+
+    core->>repository: send data
+    repository->>DB: storage data
+    DB-->>repository: return result
+end
+
+```
+
+## TODO List
+
+- [ ] unit test
+- [ ] optimizer scanner-server eth request
+- [ ] update docker-compose.yml
