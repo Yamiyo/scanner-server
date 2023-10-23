@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/stretchr/testify/suite"
+	"math/big"
 	"portto-homework/internal/ethclient"
 	"portto-homework/internal/utils/logger"
 	"portto-homework/service/scanner-service/config"
@@ -11,6 +12,7 @@ import (
 	"portto-homework/service/scanner-service/repository/db"
 	"sync"
 	"testing"
+	"time"
 )
 
 func TestETHCore_TestSuite(t *testing.T) {
@@ -51,8 +53,11 @@ func (suite *ethCore_TestSuite) SetupTest() {
 			BlockRepo:       repo.BlocksRepo,
 			TransactionRepo: repo.TransactionsRepo,
 		},
-		wg:      &sync.WaitGroup{},
-		parseCh: make(chan *types.Block, config.GetScannerConfig().PipelineNumber),
+		realTimeWg: &sync.WaitGroup{},
+		historyWg:  &sync.WaitGroup{},
+		realTimeCh: make(chan *types.Block, config.GetScannerConfig().PipelineNumber),
+		historyCh:  make(chan *types.Block, config.GetScannerConfig().PipelineNumber),
+		subFrom:    0,
 	}
 
 	suite.ethCore.run(suite.ctx)
@@ -63,8 +68,24 @@ func (suite *ethCore_TestSuite) TearDownTest() {
 }
 
 func (suite *ethCore_TestSuite) TestETHCore_StorageBlockNumberList_OK() {
-	latest, err := suite.ethCore.in.EthClient.BlockNumber(suite.ctx)
-
+	num, err := suite.ethCore.in.EthClient.BlockNumber(suite.ctx)
 	suite.NoError(err)
-	suite.NoError(suite.ethCore.ScanBlockDataFromNum(suite.ctx, latest-50))
+
+	latest := big.Int{}
+	from := big.Int{}
+	if suite.ethCore.in.Conf.ScannerConfig.ScanBlockFrom < 0 {
+		from.Sub(latest.SetUint64(num), big.NewInt(int64(-suite.ethCore.in.Conf.ScannerConfig.ScanBlockFrom)))
+	} else {
+		from.SetUint64(uint64(suite.ethCore.in.Conf.ScannerConfig.ScanBlockFrom))
+	}
+
+	suite.NoError(suite.ethCore.ScanBlockDataFromNum(suite.ctx, from.Uint64()))
+}
+
+func (suite *ethCore_TestSuite) TestETHCore_Subscribe_OK() {
+	ctx, cancel := context.WithCancel(suite.ctx)
+	suite.ethCore.SubScribe(ctx)
+
+	time.Sleep(20 * time.Second)
+	cancel()
 }

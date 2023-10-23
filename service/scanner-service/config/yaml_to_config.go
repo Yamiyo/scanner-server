@@ -23,6 +23,7 @@ type DBConfig struct {
 
 // scanConfig
 type ScannerConfig struct {
+	ScanInterval   int `mapstructure:"scan_interval"`
 	PipelineNumber int `mapstructure:"pipeline_number"`
 	ScanBlockFrom  int `mapstructure:"scan_block_from"`
 }

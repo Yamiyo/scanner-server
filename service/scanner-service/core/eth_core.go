@@ -7,6 +7,7 @@ import (
 	"portto-homework/internal/model/po"
 	"portto-homework/internal/utils/logger"
 	"sync"
+	"time"
 )
 
 type ETHCore interface {
@@ -14,16 +15,22 @@ type ETHCore interface {
 }
 
 type ethCore struct {
-	in      CoreIn
-	parseCh chan *types.Block
-	wg      *sync.WaitGroup
+	in         CoreIn
+	realTimeCh chan *types.Block
+	historyCh  chan *types.Block
+	realTimeWg *sync.WaitGroup
+	historyWg  *sync.WaitGroup
+
+	subFrom uint64
 }
 
 func newETHCore(in CoreIn) ETHCore {
 	eth := &ethCore{
-		in:      in,
-		parseCh: make(chan *types.Block, in.Conf.ScannerConfig.PipelineNumber),
-		wg:      &sync.WaitGroup{},
+		in:         in,
+		realTimeCh: make(chan *types.Block, in.Conf.ScannerConfig.PipelineNumber),
+		historyCh:  make(chan *types.Block, in.Conf.ScannerConfig.PipelineNumber),
+		realTimeWg: &sync.WaitGroup{},
+		historyWg:  &sync.WaitGroup{},
 	}
 
 	eth.run(context.Background())
@@ -32,71 +39,131 @@ func newETHCore(in CoreIn) ETHCore {
 }
 
 func (core *ethCore) close() {
-	// close parseCh
-	close(core.parseCh)
+	// close realTimeCh
+	close(core.realTimeCh)
+	// close historyCh
+	close(core.historyCh)
 
 	// wait for all goroutine done
-	core.wg.Wait()
+	core.realTimeWg.Wait()
+	core.historyWg.Wait()
+}
+
+// SubScribe subscribe function need to be called before ScanBlockDataFromNum
+func (core *ethCore) SubScribe(ctx context.Context) {
+	// get start subscribe block number
+	from, err := core.in.EthClient.BlockNumber(ctx)
+	if err != nil {
+		logger.SysLog().Error(ctx, err.Error())
+		panic(err)
+	}
+	core.subFrom = from
+
+	core.realTimeWg.Add(1)
+	go func() {
+		core.realTimeWg.Done()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+			}
+			// get latest block number
+			latest, err := core.in.EthClient.BlockNumber(ctx)
+			if err != nil {
+				logger.SysLog().Error(ctx, err.Error())
+				return
+			}
+
+			for ; from < latest; from++ {
+				block, err := core.in.EthClient.BlockByNumber(ctx, new(big.Int).SetUint64(from))
+				if err != nil {
+					return
+				}
+
+				core.realTimeCh <- block
+			}
+
+			time.Sleep(time.Duration(core.in.Conf.ScannerConfig.ScanInterval) * time.Second)
+		}
+	}()
 }
 
 func (core *ethCore) ScanBlockDataFromNum(ctx context.Context, num uint64) error {
 	// get latest block number
-	latest, err := core.in.EthClient.BlockNumber(ctx)
-	if err != nil {
-		return err
+	if core.subFrom == 0 {
+		// get latest block number
+		latest, err := core.in.EthClient.BlockNumber(ctx)
+		if err != nil {
+			return err
+		}
+		core.subFrom = latest
 	}
 
-	for i := num; i < latest; i++ {
+	for i := num; i < core.subFrom; i++ {
 		block, err := core.in.EthClient.BlockByNumber(ctx, new(big.Int).SetUint64(i))
 		if err != nil {
 			return err
 		}
 
-		core.parseCh <- block
+		core.historyCh <- block
+		select {
+		case <-ctx.Done():
+			return nil
+		default:
+		}
 	}
 
 	return nil
 }
 
 func (core *ethCore) run(ctx context.Context) {
-
+	// create multi goroutine to parse block real time data
 	for i := 0; i < core.in.Conf.ScannerConfig.PipelineNumber; i++ {
-		core.wg.Add(1)
-		go func() {
-			defer core.wg.Done()
-			db := core.in.DB.Session()
-			for block := range core.parseCh {
-				if block == nil {
-					continue
-				}
+		core.realTimeWg.Add(1)
+		go core.getBlockFromChan(ctx, core.realTimeWg, core.realTimeCh)
+	}
 
-				transactions, logs, err := core.getTransactionsByBlock(ctx, block)
-				if err != nil {
-					logger.SysLog().Error(ctx, err.Error())
-					return
-				}
+	//create multi goroutine to parse block history data
+	for i := 0; i < core.in.Conf.ScannerConfig.PipelineNumber; i++ {
+		core.historyWg.Add(1)
+		go core.getBlockFromChan(ctx, core.historyWg, core.historyCh)
+	}
+}
 
-				if err := core.in.BlockRepo.CreateBlock(ctx, db, &po.Block{
-					Num:        block.Number().Uint64(),
-					Hash:       block.Hash().String(),
-					ParentHash: block.ParentHash().String(),
-					Time:       block.Time(),
-				}); err != nil {
-					logger.SysLog().Error(ctx, err.Error())
-					return
-				}
+func (core *ethCore) getBlockFromChan(ctx context.Context, wg *sync.WaitGroup, ch chan *types.Block) {
+	defer wg.Done()
+	db := core.in.DB.Session()
+	for block := range ch {
+		if block == nil {
+			continue
+		}
 
-				if err := core.in.TransactionRepo.CreateTransaction(ctx, db, transactions); err != nil {
-					logger.SysLog().Error(ctx, err.Error())
-					return
-				}
+		transactions, logs, err := core.getTransactionsByBlock(ctx, block)
+		if err != nil {
+			logger.SysLog().Error(ctx, err.Error())
+			return
+		}
 
-				if err := core.in.TransactionRepo.CreateTransactionLogs(ctx, db, logs); err != nil {
-					logger.SysLog().Error(ctx, err.Error())
-					return
-				}
-			}
-		}()
+		if err := core.in.BlockRepo.CreateBlock(ctx, db, &po.Block{
+			Num:        block.Number().Uint64(),
+			Hash:       block.Hash().String(),
+			ParentHash: block.ParentHash().String(),
+			Time:       block.Time(),
+		}); err != nil {
+			logger.SysLog().Error(ctx, err.Error())
+			return
+		}
+
+		if err := core.in.TransactionRepo.CreateTransaction(ctx, db, transactions); err != nil {
+			logger.SysLog().Error(ctx, err.Error())
+			return
+		}
+
+		if err := core.in.TransactionRepo.CreateTransactionLogs(ctx, db, logs); err != nil {
+			logger.SysLog().Error(ctx, err.Error())
+			return
+		}
 	}
 }
 
