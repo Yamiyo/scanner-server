@@ -5,16 +5,16 @@ type GetBlockLatestNReq struct {
 }
 
 type GetBlockLatestNResp struct {
-	Num        uint64 `json:"block_num"`
-	Hash       string `json:"block_hash"`
-	Time       uint64 `json:"block_time"`
-	ParentHash string `json:"parent_hash"`
+	Num        uint64 `json:"block_num" example:"34449189"`
+	Hash       string `json:"block_hash" example:"0x0000000"`
+	Time       uint64 `json:"block_time" example:"1631534170"`
+	ParentHash string `json:"parent_hash" example:"0x0000000"`
 }
 
 type GetBlockInfoResp struct {
-	Num          uint64   `json:"block_num"`
-	Hash         string   `json:"block_hash"`
-	Time         uint64   `json:"block_time"`
-	ParentHash   string   `json:"parent_hash"`
-	Transactions []string `json:"transactions"`
+	Num          uint64   `json:"block_num" example:"34449189"`
+	Hash         string   `json:"block_hash" example:"0x0000000"`
+	Time         uint64   `json:"block_time" example:"1631534170"`
+	ParentHash   string   `json:"parent_hash" example:"0x0000000"`
+	Transactions []string `json:"transactions" example:"[0x0000000, 0x0000001, 0x0000002]"`
 }
