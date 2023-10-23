@@ -1,3 +1,4 @@
+//go:generate mockgen -destination=./../../mocks/mock_transaction_ctrl.go -source=transaction_ctrl.go TxnCtrl
 package restctl
 
 import (

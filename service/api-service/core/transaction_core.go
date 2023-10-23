@@ -1,3 +1,4 @@
+//go:generate mockgen -destination=./../mocks/mock_transaction_core.go -source=transaction_core.go TxnCore
 package core
 
 import (

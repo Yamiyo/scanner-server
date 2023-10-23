@@ -1,3 +1,4 @@
+//go:generate mockgen -destination=./../mocks/mock_block_core.go -source=block_core.go BlockCore
 package core
 
 import (

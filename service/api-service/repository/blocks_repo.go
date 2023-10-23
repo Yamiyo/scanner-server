@@ -1,3 +1,4 @@
+//go:generate mockgen -destination=./../mocks/mock_block_repo.go -source=blocks_repo.go BlocksRepo
 package repository
 
 import (

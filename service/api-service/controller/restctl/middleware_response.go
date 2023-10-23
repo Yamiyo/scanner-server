@@ -1,3 +1,4 @@
+//go:generate mockgen -destination=./../../mocks/mock_middleware_ctrl.go -source=middleware_response.go ResponseMiddlewareInterface
 package restctl
 
 import (

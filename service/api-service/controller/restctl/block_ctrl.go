@@ -1,3 +1,4 @@
+//go:generate mockgen -destination=./../../mocks/mock_block_ctrl.go -source=block_ctrl.go BlockCtrl
 package restctl
 
 import (
