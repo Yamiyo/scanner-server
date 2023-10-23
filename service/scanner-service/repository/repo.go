@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"portto-homework/internal/utils/logger"
 	"sync"
 )
 
@@ -11,7 +10,6 @@ var (
 )
 
 type DBRepoIn struct {
-	Log logger.LoggerInterface
 }
 
 type DBRepo struct {

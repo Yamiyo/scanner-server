@@ -28,13 +28,16 @@ type CoreIn struct {
 }
 
 type CoreOut struct {
+	ETHCore ETHCore
 }
 
 func New(in CoreIn) CoreOut {
 	once.Do(func() {
 		self = &core{
-			in:      in,
-			CoreOut: CoreOut{},
+			in: in,
+			CoreOut: CoreOut{
+				ETHCore: newETHCore(in),
+			},
 		}
 	})
 

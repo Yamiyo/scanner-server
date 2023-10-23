@@ -36,9 +36,7 @@ func (suite *ethCore_TestSuite) SetupTest() {
 		panic(err)
 	}
 
-	repo := repository.NewDBRepo(repository.DBRepoIn{
-		Log: logger.SysLog(),
-	})
+	repo := repository.NewDBRepo(repository.DBRepoIn{})
 
 	suite.ctx = context.Background()
 	suite.log = logger.SysLog()
@@ -64,7 +62,7 @@ func (suite *ethCore_TestSuite) SetupTest() {
 }
 
 func (suite *ethCore_TestSuite) TearDownTest() {
-	suite.ethCore.close()
+	suite.ethCore.Close()
 }
 
 func (suite *ethCore_TestSuite) TestETHCore_StorageBlockNumberList_OK() {

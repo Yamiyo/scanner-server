@@ -11,7 +11,10 @@ import (
 )
 
 type ETHCore interface {
+	GetSubscribeFrom() uint64
+	SubScribe(ctx context.Context)
 	ScanBlockDataFromNum(ctx context.Context, num uint64) error
+	Close()
 }
 
 type ethCore struct {
@@ -38,7 +41,7 @@ func newETHCore(in CoreIn) ETHCore {
 	return eth
 }
 
-func (core *ethCore) close() {
+func (core *ethCore) Close() {
 	// close realTimeCh
 	close(core.realTimeCh)
 	// close historyCh
@@ -46,7 +49,13 @@ func (core *ethCore) close() {
 
 	// wait for all goroutine done
 	core.realTimeWg.Wait()
+	logger.SysLog().Info(context.Background(), "real time pipeline shutdown done")
 	core.historyWg.Wait()
+	logger.SysLog().Info(context.Background(), "history pipeline shutdown done")
+}
+
+func (core *ethCore) GetSubscribeFrom() uint64 {
+	return core.subFrom
 }
 
 // SubScribe subscribe function need to be called before ScanBlockDataFromNum

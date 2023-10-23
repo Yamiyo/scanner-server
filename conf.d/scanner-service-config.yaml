@@ -13,6 +13,7 @@ db_config:
   max_open: 20
   conn_max_life_min: 15
 scanner_config:
+  endpoint: "https://data-seed-prebsc-2-s3.binance.org:8545/"
   scan_interval: 5 # unit: second
   pipeline_number: 10
   scan_block_from: -100 # negative number means from the (latest-n) block, positive number means from the n block
