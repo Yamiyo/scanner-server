@@ -1,6 +1,7 @@
 package restctl
 
 import (
+	"portto-homework/service/api-service/core"
 	"sync"
 
 	"portto-homework/service/api-service/config"
@@ -17,11 +18,15 @@ type restCtrl struct {
 }
 
 type RestCtrlIn struct {
-	Conf config.ConfigSetup
+	Conf      config.ConfigSetup
+	BlockCore core.BlockCore
+	TxnCore   core.TxnCore
 }
 
 type RestCtrlOut struct {
-	ModdlewareCtrl ResponseMiddlewareInterface
+	MiddlewareCtrl ResponseMiddlewareInterface
+	BlockCtrl      BlockCtrl
+	TxnCtrl        TxnCtrl
 }
 
 func New(in RestCtrlIn) RestCtrlOut {
@@ -29,7 +34,9 @@ func New(in RestCtrlIn) RestCtrlOut {
 		self = &restCtrl{
 			in: in,
 			RestCtrlOut: RestCtrlOut{
-				ModdlewareCtrl: newResponseMiddleware(),
+				MiddlewareCtrl: newResponseMiddleware(),
+				BlockCtrl:      newBlockCtrl(in),
+				TxnCtrl:        newTxnCtrl(in),
 			},
 		}
 	})
