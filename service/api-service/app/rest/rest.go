@@ -3,6 +3,9 @@ package rest
 import (
 	"context"
 	"net/http"
+	"portto-homework/service/api-service/core"
+	"portto-homework/service/api-service/repository"
+	"portto-homework/service/api-service/repository/db"
 	"sync"
 
 	"portto-homework/internal/utils/logger"
@@ -24,12 +27,25 @@ var (
 
 func NewRestService(ctx context.Context, conf config.ConfigSetup) ServiceInterface {
 	once.Do(func() {
+		repo := repository.NewDBRepo(repository.DBRepoIn{})
+
+		co := core.New(core.CoreIn{
+			Conf:      conf,
+			DB:        db.NewDBClient(),
+			BlockRepo: repo.BlocksRepo,
+			TxnRepo:   repo.TransactionsRepo,
+		})
+
 		ctrl := restctl.New(restctl.RestCtrlIn{
-			Conf: conf,
+			Conf:      conf,
+			BlockCore: co.BlockCore,
+			TxnCore:   co.TxnCore,
 		})
 
 		self = &restService{
-			ResponseMiddleware: ctrl.ModdlewareCtrl,
+			ResponseMiddleware: ctrl.MiddlewareCtrl,
+			BlockCtrl:          ctrl.BlockCtrl,
+			TxnCtrl:            ctrl.TxnCtrl,
 		}
 	})
 
@@ -42,6 +58,8 @@ type ServiceInterface interface {
 
 type restService struct {
 	ResponseMiddleware restctl.ResponseMiddlewareInterface
+	BlockCtrl          restctl.BlockCtrl
+	TxnCtrl            restctl.TxnCtrl
 }
 
 func (s *restService) Run(ctx context.Context, stop chan error) {
