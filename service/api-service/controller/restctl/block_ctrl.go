@@ -1,10 +1,12 @@
 package restctl
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
-	"portto-homework/internal/constant"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+
+	"portto-homework/internal/constant"
 )
 
 type BlockCtrl interface {

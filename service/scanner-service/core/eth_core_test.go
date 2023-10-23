@@ -2,17 +2,19 @@ package core
 
 import (
 	"context"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/stretchr/testify/suite"
 	"math/big"
+	"sync"
+	"testing"
+	"time"
+
 	"portto-homework/internal/ethclient"
 	"portto-homework/internal/utils/logger"
 	"portto-homework/service/scanner-service/config"
 	"portto-homework/service/scanner-service/repository"
 	"portto-homework/service/scanner-service/repository/db"
-	"sync"
-	"testing"
-	"time"
+
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/stretchr/testify/suite"
 )
 
 func TestETHCore_TestSuite(t *testing.T) {

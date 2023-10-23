@@ -6,16 +6,16 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"portto-homework/internal/ethclient"
-	"portto-homework/service/scanner-service/core"
-	"portto-homework/service/scanner-service/repository"
-	"portto-homework/service/scanner-service/repository/db"
 	"sync"
 	"syscall"
 	"time"
 
+	"portto-homework/internal/ethclient"
 	"portto-homework/internal/utils/logger"
 	"portto-homework/service/scanner-service/config"
+	"portto-homework/service/scanner-service/core"
+	"portto-homework/service/scanner-service/repository"
+	"portto-homework/service/scanner-service/repository/db"
 )
 
 var (

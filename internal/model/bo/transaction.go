@@ -1,7 +1,6 @@
 package bo
 
-type GetTransactionsReq struct {
-}
+type GetTransactionsReq struct{}
 
 type GetTransactionInfoResp struct {
 	BlockNum uint64            `json:"block_num" example:"34449189" format:"uint64"`

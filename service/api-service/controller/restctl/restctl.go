@@ -1,10 +1,10 @@
 package restctl
 
 import (
-	"portto-homework/service/api-service/core"
 	"sync"
 
 	"portto-homework/service/api-service/config"
+	"portto-homework/service/api-service/core"
 )
 
 var (

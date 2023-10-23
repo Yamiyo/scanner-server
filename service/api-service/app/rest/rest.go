@@ -3,14 +3,14 @@ package rest
 import (
 	"context"
 	"net/http"
-	"portto-homework/service/api-service/core"
-	"portto-homework/service/api-service/repository"
-	"portto-homework/service/api-service/repository/db"
 	"sync"
 
 	"portto-homework/internal/utils/logger"
 	"portto-homework/service/api-service/config"
 	"portto-homework/service/api-service/controller/restctl"
+	"portto-homework/service/api-service/core"
+	"portto-homework/service/api-service/repository"
+	"portto-homework/service/api-service/repository/db"
 
 	"github.com/gin-gonic/gin"
 )

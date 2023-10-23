@@ -9,8 +9,7 @@ var (
 	self *DBRepo
 )
 
-type DBRepoIn struct {
-}
+type DBRepoIn struct{}
 
 type DBRepo struct {
 	in DBRepoIn

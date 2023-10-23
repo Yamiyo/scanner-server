@@ -1,11 +1,13 @@
 package core
 
 import (
-	"github.com/ethereum/go-ethereum/ethclient"
+	"sync"
+
 	"portto-homework/service/scanner-service/config"
 	"portto-homework/service/scanner-service/repository"
 	"portto-homework/service/scanner-service/repository/db"
-	"sync"
+
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 var (

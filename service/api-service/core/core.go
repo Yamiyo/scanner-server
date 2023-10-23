@@ -1,10 +1,11 @@
 package core
 
 import (
+	"sync"
+
 	"portto-homework/service/api-service/config"
 	"portto-homework/service/api-service/repository"
 	"portto-homework/service/api-service/repository/db"
-	"sync"
 )
 
 var (

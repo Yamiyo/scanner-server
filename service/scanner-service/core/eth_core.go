@@ -2,12 +2,14 @@ package core
 
 import (
 	"context"
-	"github.com/ethereum/go-ethereum/core/types"
 	"math/big"
-	"portto-homework/internal/model/po"
-	"portto-homework/internal/utils/logger"
 	"sync"
 	"time"
+
+	"portto-homework/internal/model/po"
+	"portto-homework/internal/utils/logger"
+
+	"github.com/ethereum/go-ethereum/core/types"
 )
 
 type ETHCore interface {
@@ -133,7 +135,7 @@ func (core *ethCore) run(ctx context.Context) {
 		go core.getBlockFromChan(ctx, core.realTimeWg, core.realTimeCh)
 	}
 
-	//create multi goroutine to parse block history data
+	// create multi goroutine to parse block history data
 	for i := 0; i < core.in.Conf.ScannerConfig.PipelineNumber; i++ {
 		core.historyWg.Add(1)
 		go core.getBlockFromChan(ctx, core.historyWg, core.historyCh)

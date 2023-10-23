@@ -1,8 +1,10 @@
 package restctl
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+
 	"portto-homework/internal/constant"
 )
 

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"portto-homework/service/api-service/repository/db"
 	"sync"
 	"syscall"
 	"time"
@@ -14,6 +13,7 @@ import (
 	"portto-homework/internal/utils/logger"
 	"portto-homework/service/api-service/app/rest"
 	"portto-homework/service/api-service/config"
+	"portto-homework/service/api-service/repository/db"
 )
 
 var (
