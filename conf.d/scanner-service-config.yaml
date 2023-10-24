@@ -4,7 +4,7 @@ server_config:
   level: "debug"
   shutdown_timeout: 5 # unit: second
 db_config:
-  address: '127.0.0.1:3306'
+  address: 'mysql-db:3306'
   username: 'root'
   password: 'portto'
   database: 'blockchain'
@@ -16,4 +16,4 @@ scanner_config:
   endpoint: "https://data-seed-prebsc-2-s3.binance.org:8545/"
   scan_interval: 5 # unit: second
   pipeline_number: 10
-  scan_block_from: -100 # negative number means from the (latest-n) block, positive number means from the n block
+  scan_block_from: -300 # negative number means from the (latest-n) block, positive number means from the n block
