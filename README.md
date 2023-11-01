@@ -101,6 +101,6 @@ end
 
 ## TODO List
 
+- [x] update docker-compose.yml
 - [ ] unit test
 - [ ] optimizer scanner-server eth request
-- [ ] update docker-compose.yml
