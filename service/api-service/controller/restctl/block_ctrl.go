@@ -34,7 +34,7 @@ func newBlockCtrl(in RestCtrlIn) BlockCtrl {
 // @Param Content-Type header string false "Request data format. Example: `application/json;charset=utf-8`"
 // @Param ChainID header string false "request chain ID with UUID format. Example: `5d714332-60b4-451d-b45e-539f7b77f562`"
 // @Param limit query string true "Input limit. Example: 25"
-// @Success 200 {object} []*bo.GetBlockLatestNResp
+// @Success 200 {object} resp{data=[]bo.GetBlockLatestNResp}
 // @Router /blocks [get]
 func (ctrl *blockCtrl) GetBlockLatestN(ctx *gin.Context) {
 	limit, err := strconv.Atoi(ctx.Query("limit"))
@@ -60,7 +60,7 @@ func (ctrl *blockCtrl) GetBlockLatestN(ctx *gin.Context) {
 // @Param Content-Type header string false "Request data format. Example: `application/json;charset=utf-8`"
 // @Param ChainID header string false "request chain ID with UUID format. Example: `5d714332-60b4-451d-b45e-539f7b77f562`"
 // @Param num path string true "Input num. Example: `34449189`"
-// @Success 200 {object} *bo.GetBlockInfoResp
+// @Success 200 {object} resp{data=bo.GetBlockInfoResp}
 // @Router /blocks/:num [get]
 func (ctrl *blockCtrl) GetBlockInfo(ctx *gin.Context) {
 	id, err := strconv.ParseUint(ctx.Param("num"), 10, 64)

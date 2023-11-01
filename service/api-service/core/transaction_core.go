@@ -3,6 +3,7 @@ package core
 
 import (
 	"context"
+	"strconv"
 
 	"portto-homework/internal/model/bo"
 )
@@ -47,7 +48,7 @@ func (core *txnCore) GetTxnInfo(ctx context.Context, txnHash string) (*bo.GetTra
 		From:     txn.From,
 		To:       txn.To,
 		Value:    txn.Value,
-		Nonce:    txn.Nonce,
+		Nonce:    strconv.FormatUint(txn.Nonce, 10),
 		Data:     txn.Data,
 		Logs:     logs,
 	}, nil

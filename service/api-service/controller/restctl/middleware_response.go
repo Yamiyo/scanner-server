@@ -22,15 +22,15 @@ type ResponseMiddlewareInterface interface {
 type responseMiddleware struct{}
 
 type meta struct {
-	RequestID   string    `json:"request_id"`
-	UserID      string    `json:"user_id"`
-	RequestTime time.Time `json:"request_time"`
-	Times       float64   `json:"times"`
+	RequestID   string    `json:"request_id" example:"5d714332-60b4-451d-b45e-539f7b77f562"`
+	UserID      string    `json:"user_id" example:"5d714332-60b4-451d-b45e-539f7b77f562"`
+	RequestTime time.Time `json:"request_time" example:"2023-11-01T07:55:48.51208251Z"`
+	Times       float64   `json:"times" example:"0.22385625"`
 }
 
 type resp struct {
 	Meta        meta        `json:"meta"`
-	MessageCode string      `json:"msg_code"`
+	MessageCode string      `json:"msg_code" example:"invalidate_parameter"`
 	Data        interface{} `json:"data"`
 }
 

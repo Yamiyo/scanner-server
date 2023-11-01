@@ -29,6 +29,22 @@ type RestCtrlOut struct {
 	TxnCtrl        TxnCtrl
 }
 
+// @title api-service: RESTFul API for portto homework.
+// @version 1.0
+// @description API Service provides web3 blocks & transactions info.
+
+// @host 127.0.0.1:12345
+// @accept json
+// @produce json
+// @query.collection.format multi
+// @schemes https
+
+// @in header
+
+// @tag.name block
+// @tag.description Get block info
+// @tag.name transaction
+// @tag.description Get transaction info
 func New(in RestCtrlIn) RestCtrlOut {
 	once.Do(func() {
 		self = &restCtrl{
