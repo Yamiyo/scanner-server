@@ -21,6 +21,12 @@
 
 ---
 
+# API Document
+```
+1. open docs/index.html
+2. select local json file to open docs/swagger.json
+```
+
 # Start Service
 ```
 go run ./cmd/api-server/main.go
