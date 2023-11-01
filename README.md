@@ -27,6 +27,11 @@ go run ./cmd/api-server/main.go
 go run ./cmd/scanner-server/main.go
 ```
 
+or
+```
+docker-compose up -d
+```
+
 # Sequence Diagram
 ```mermaid
 sequenceDiagram
