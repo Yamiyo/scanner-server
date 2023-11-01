@@ -28,7 +28,8 @@ go run ./cmd/scanner-server/main.go
 ```
 
 # Sequence Diagram
-```plantuml
+```mermaid
+sequenceDiagram
 title API-Service
 
 actor client
@@ -66,7 +67,8 @@ DB-->>client: return result
 
 ```
 
-```plantuml
+```mermaid
+sequenceDiagram
 
 title Scanner-Service
 
