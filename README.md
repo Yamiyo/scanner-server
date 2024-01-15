@@ -1,4 +1,5 @@
-# portto-homework
+# Scanner Server
+Scan blockchain data to DB and provide api to search
 
 # Folder Structure
 ---
